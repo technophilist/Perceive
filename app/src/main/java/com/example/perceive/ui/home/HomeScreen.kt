@@ -1,7 +1,6 @@
 package com.example.perceive.ui.home
 
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,12 +23,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
@@ -39,6 +41,8 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.perceive.R
 import com.example.perceive.ui.components.AssistantResponseCard
 import com.example.perceive.ui.components.CameraPreview
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -61,6 +65,8 @@ fun HomeScreen(
     val isMicIconVisible by remember(isListening, isLoadingResponse) {
         derivedStateOf { !isListening && !isLoadingResponse }
     }
+    val localHapticFeedback = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
     Box(modifier = modifier) {
         CameraPreview(
             modifier = Modifier.fillMaxSize(),
@@ -71,7 +77,16 @@ fun HomeScreen(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .heightIn(min = 100.dp)
-                .clickable(isMicIconVisible) { onStartListening() }
+                .clickable(isMicIconVisible) {
+                    scope.launch {
+                        // custom haptic feedback
+                        repeat(2) {
+                            localHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                            delay(100)
+                        }
+                    }
+                    onStartListening()
+                }
                 .background(Color(0xff121212))
                 .padding(16.dp)
                 .navigationBarsPadding(),
