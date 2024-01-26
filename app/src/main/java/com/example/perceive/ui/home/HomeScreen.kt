@@ -44,6 +44,27 @@ import com.example.perceive.ui.components.CameraPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
+@Composable
+fun HomeScreen(
+    cameraController: LifecycleCameraController,
+    transcriptionText: String?,
+    homeScreenUiState: HomeScreenUiState,
+    onStartListening: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    HomeScreen(
+        modifier = modifier,
+        cameraController = cameraController,
+        userTextTranscription = transcriptionText,
+        assistantResponse = homeScreenUiState.assistantResponse,
+        isListening = homeScreenUiState.isListening,
+        onStartListening = onStartListening,
+        isLoadingResponse = homeScreenUiState.isLoadingAssistantResponse
+    )
+
+}
+
 @Composable
 fun HomeScreen(
     cameraController: LifecycleCameraController,
