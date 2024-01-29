@@ -117,7 +117,7 @@ fun HomeScreen(
             AnimatedVisibility(visible = assistantResponse != null) {
                 AssistantResponseCard(
                     modifier = Modifier.fillMaxWidth(),
-                    responseText = "Hello World ".repeat(20)
+                    responseText = assistantResponse!!
                 )
             }
             Spacer(modifier = Modifier.size(16.dp))
