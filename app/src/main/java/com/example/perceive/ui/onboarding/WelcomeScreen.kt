@@ -38,6 +38,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -97,16 +98,30 @@ fun WelcomeScreen(onNavigateToHomeScreenButtonClick: () -> Unit) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // background gif
-        Image(
-            modifier = Modifier
-                .fillMaxSize()
-                .rotate(180f)
-                .blur(64.dp),
-            painter = asyncImagePainter,
-            contentDescription = null,
-            contentScale = ContentScale.Crop
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // animate blurred background gif
+            Image(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .rotate(180f)
+                    .blur(64.dp),
+                painter = asyncImagePainter,
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            // static bg image since blur modifier doesn't work for API levels
+            // lower than S.
+            Image(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .rotate(180f),
+                painter = painterResource(id = R.drawable.welcome_screen_blurred_bg_static),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+        }
+
         // scrim
         Box(
             modifier = Modifier
