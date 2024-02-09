@@ -97,7 +97,7 @@ dependencies {
 
     // hilt
     implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     // sdk for google's gemini models
@@ -108,4 +108,7 @@ dependencies {
 
     // coroutines-test
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+}
+kapt {
+    correctErrorTypes = true
 }
