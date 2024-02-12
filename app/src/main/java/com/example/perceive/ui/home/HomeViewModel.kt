@@ -36,7 +36,6 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         _uiState.update {
             it.copy(
                 isListening = false,
-                isLoadingAssistantResponse = false,
                 hasErrorOccurred = true
             )
         }
@@ -49,31 +48,19 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     fun onStopListening() {
         if (_userSpeechTranscriptionStream.value?.isBlank() == true || currentCameraImage == null) {
             _uiState.update {
-                it.copy(
-                    isListening = false,
-                    isLoadingAssistantResponse = false,
-                    assistantResponse = null // clear any previous assistant responses
-                )
+                it.copy(isListening = false)
             }
             return
         }
         _uiState.update {
-            it.copy(
-                isListening = false,
-                isLoadingAssistantResponse = true,
-                assistantResponse = null // clear any previous assistant responses
-            )
+            it.copy(isListening = false)
         }
 
         viewModelScope.launch {
             // todo:  process request
             _uiState.update {
                 delay(3.seconds)
-                it.copy(
-                    isListening = false,
-                    isLoadingAssistantResponse = false,
-                    assistantResponse = "Hi there! Thanks for reaching out! I can definitely help you with that!!"
-                )
+                it.copy(isListening = false)
             }
         }
     }
