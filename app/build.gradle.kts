@@ -87,9 +87,6 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("io.coil-kt:coil-gif:2.4.0")
 
-    // lottie compose
-    implementation("com.airbnb.android:lottie-compose:6.1.0")
-
     // CameraX
     implementation("androidx.camera:camera-core:1.3.1")
     implementation("androidx.camera:camera-camera2:1.3.1")
