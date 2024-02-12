@@ -2,6 +2,8 @@ package com.example.perceive.ui.home
 
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +17,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -28,18 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.example.perceive.R
-import com.example.perceive.ui.components.AssistantResponseCard
+import com.example.perceive.ui.components.AnimatedMicButton
 import com.example.perceive.ui.components.CameraPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -57,10 +53,8 @@ fun HomeScreen(
         modifier = modifier,
         cameraController = cameraController,
         userTextTranscription = transcriptionText,
-        assistantResponse = homeScreenUiState.assistantResponse,
         isListening = homeScreenUiState.isListening,
         onStartListening = onStartListening,
-        isLoadingResponse = homeScreenUiState.isLoadingAssistantResponse
     )
 
 }
@@ -69,25 +63,16 @@ fun HomeScreen(
 fun HomeScreen(
     cameraController: LifecycleCameraController,
     userTextTranscription: String?,
-    assistantResponse: String?,
     isListening: Boolean,
     onStartListening: () -> Unit,
-    isLoadingResponse: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val textGradientBrush = remember {
-        Brush.horizontalGradient(
-            listOf(Color(0xff4285f4), Color.White)
-        )
-    }
-    val waveformAnimationComposition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(R.raw.lottie_listening_anim)
-    )
-    val isMicIconVisible by remember(isListening, isLoadingResponse) {
-        derivedStateOf { !isListening && !isLoadingResponse }
+        Brush.horizontalGradient(listOf(Color(0xff4285f4), Color.White))
     }
     val localHapticFeedback = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
+
     Box(modifier = modifier) {
         CameraPreview(
             modifier = Modifier.fillMaxSize(),
@@ -96,9 +81,30 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .heightIn(min = 100.dp)
-                .clickable(isMicIconVisible) {
+                .navigationBarsPadding()
+                .padding(16.dp)
+        ) {
+            AnimatedVisibility(userTextTranscription != null, enter = fadeIn()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .animateContentSize(),
+                        text = userTextTranscription ?: "Hi there! Tap to get started",
+                        style = MaterialTheme.typography.titleLarge.copy(brush = textGradientBrush)
+                    )
+                }
+            }
+
+            AnimatedMicButton(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                isAnimationRunning = isListening,
+                onClick = {
                     scope.launch {
                         // custom haptic feedback
                         repeat(2) {
@@ -108,48 +114,6 @@ fun HomeScreen(
                     }
                     onStartListening()
                 }
-                .background(Color(0xff121212))
-                .padding(16.dp)
-                .navigationBarsPadding(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            AnimatedVisibility(visible = assistantResponse != null) {
-                AssistantResponseCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    responseText = assistantResponse ?: ""
-                )
-            }
-            Spacer(modifier = Modifier.size(16.dp))
-            Text(
-                text = userTextTranscription ?: "Hi there! Tap to get started",
-                style = MaterialTheme.typography.titleLarge.copy(brush = textGradientBrush)
-            )
-            Spacer(modifier = Modifier.size(16.dp))
-            if (isListening) {
-                LottieAnimation(
-                    composition = waveformAnimationComposition,
-                    reverseOnRepeat = true,
-                    iterations = LottieConstants.IterateForever
-                )
-            }
-            if (isMicIconVisible) {
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_mic_24),
-                    tint = Color(0xff4285f4),
-                    contentDescription = null,
-                )
-            }
-        }
-        if (isLoadingResponse) {
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .systemBarsPadding(),
-                trackColor = Color(0xff4285f4),
-                strokeCap = StrokeCap.Butt
             )
         }
     }
