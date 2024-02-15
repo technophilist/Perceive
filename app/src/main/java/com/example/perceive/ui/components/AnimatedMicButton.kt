@@ -12,16 +12,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.perceive.R
 import com.example.perceive.ui.theme.RoundedStarShape
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 
 /**
  * Creates an animated microphone button that has a rotating "curvy circle" background.
@@ -41,17 +45,29 @@ fun AnimatedMicButton(
         targetValue = currentRotationDegrees,
         label = ""
     )
+    val localHapticFeedback = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
     LaunchedEffect(isAnimationRunning) {
         if (!isAnimationRunning) return@LaunchedEffect
         while (true) {
             ensureActive()
             delay(20)
-            currentRotationDegrees = (currentRotationDegrees - 1).takeIf { it >= 0 } ?: 360f
+            currentRotationDegrees =
+                (currentRotationDegrees - 1).takeIf { it >= 0 } ?: 360f // todo: fix animation
         }
     }
     Button(
         modifier = modifier,
-        onClick = onClick,
+        onClick = {
+            scope.launch {
+                // custom haptic feedback
+                repeat(2) {
+                    localHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    delay(100)
+                }
+            }
+            onClick()
+        },
         shape = RoundedStarShape(rotation = animatedCurrentRotationDegrees),
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xffCFE6FD))
     ) {
