@@ -41,7 +41,7 @@ fun AnimatedMicButton(
         targetValue = currentRotationDegrees,
         label = ""
     )
-    LaunchedEffect(isAnimationRunning) { // TODO remove Unit
+    LaunchedEffect(isAnimationRunning) {
         if (!isAnimationRunning) return@LaunchedEffect
         while (true) {
             ensureActive()
@@ -53,14 +53,14 @@ fun AnimatedMicButton(
         modifier = modifier,
         onClick = onClick,
         shape = RoundedStarShape(rotation = animatedCurrentRotationDegrees),
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffCFE6FD))
     ) {
         Icon(
             modifier = Modifier
                 .padding(32.dp)
                 .size(32.dp),
-            imageVector = ImageVector.vectorResource(id = R.drawable.baseline_mic_24),
-            tint = Color(0xff4285f4),
+            imageVector = ImageVector.vectorResource(id = R.drawable.outline_mic_24),
+            tint = Color(0xff121212),
             contentDescription = null,
         )
     }
