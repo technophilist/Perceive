@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -104,7 +105,11 @@ fun ChatScreen(
 
 @Composable
 private fun ChatMessagesList(chatMessages: List<ChatMessage>, modifier: Modifier = Modifier) {
-    LazyColumn(modifier) {
+    val lazyListState = rememberLazyListState()
+    LaunchedEffect(chatMessages) {
+        lazyListState.animateScrollToItem(chatMessages.lastIndex)
+    }
+    LazyColumn(modifier = modifier, state = lazyListState) {
         items(items = chatMessages, key = { it.id }) { chatMessage ->
             Box(modifier = Modifier.fillMaxWidth()) {
                 val alignment = remember {
