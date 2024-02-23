@@ -3,12 +3,16 @@ package com.example.perceive.ui.chat
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -30,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.perceive.domain.chat.ChatMessage
@@ -111,16 +116,19 @@ private fun ChatMessagesList(chatMessages: List<ChatMessage>, modifier: Modifier
     }
     LazyColumn(modifier = modifier, state = lazyListState) {
         items(items = chatMessages, key = { it.id }) { chatMessage ->
-            Box(modifier = Modifier.fillMaxWidth()) {
+            BoxWithConstraints(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
                 val alignment = remember {
                     if (chatMessage.role == ChatMessage.Role.USER) Alignment.CenterEnd
                     else Alignment.CenterStart
                 }
                 ChatMessageCard(
                     modifier = Modifier
-                        .padding(16.dp)
                         .align(alignment = alignment)
-                        .fillMaxWidth(0.7f),
+                        .widthIn(max = this.maxWidth / 1.5f),
                     messageContent = chatMessage.message,
                     role = if (chatMessage.role == ChatMessage.Role.USER) Role.USER
                     else Role.RESPONDER
