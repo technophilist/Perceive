@@ -42,6 +42,6 @@ fun ChatMessageCard(messageContent: String, role: Role, modifier: Modifier = Mod
     OutlinedCard(
         modifier = modifier,
         shape = shape,
-        content = { Text(modifier = Modifier.padding(16.dp), text = messageContent) }
+        content = { Text(modifier = Modifier.padding(24.dp), text = messageContent) }
     )
 }
