@@ -114,7 +114,8 @@ private fun ChatMessagesList(chatMessages: List<ChatMessage>, modifier: Modifier
                 ChatMessageCard(
                     modifier = Modifier
                         .padding(16.dp)
-                        .align(alignment = alignment),
+                        .align(alignment = alignment)
+                        .fillMaxWidth(0.7f),
                     messageContent = chatMessage.message,
                     role = if (chatMessage.role == ChatMessage.Role.USER) Role.USER
                     else Role.RESPONDER
