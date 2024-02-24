@@ -18,11 +18,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.perceive.ui.chat.ChatScreen
+import com.example.perceive.ui.chat.ChatViewModel
 import com.example.perceive.ui.home.HomeScreen
 import com.example.perceive.ui.home.HomeViewModel
 import com.example.perceive.ui.navigation.PerceiveNavigationDestinations
@@ -62,7 +65,12 @@ private fun NavGraphBuilder.homeScreen(route: String) {
             onStartListening = {
                 cameraController.takePicture(
                     context = context,
-                    onSuccess = { homeViewModel.startTranscription(it.toBitmap()) },
+                    onSuccess = {
+                        homeViewModel.startTranscription(
+                            currentCameraImageProxy = it,
+                            onEndOfSpeech = { /* TODO: navigate to chat screen*/ }
+                        )
+                    },
                     onError = { /*TODO*/ }
                 )
             }
