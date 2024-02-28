@@ -72,3 +72,18 @@ junit = { module = "junit:junit", version.ref = "junit" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 daggerHilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
+
+[bundles]
+compose = [
+    "androidx-compose-material3", "androidx-activity-compose",
+    "androidx-compose-ui-tooling-preview",
+    "androidx-lifecycle-viewmodel-compose",
+    "androidx-lifecycle-runtime-compose",
+    "androidx-navigation-compose",
+    "androidx-compose-ui-tooling"
+]
+
+composeTest = [
+    "androidx-compose-ui-test-manifest",
+    "androidx-compose-ui-test-junit4"
+]
