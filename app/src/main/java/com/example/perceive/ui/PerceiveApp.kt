@@ -68,7 +68,7 @@ private fun NavGraphBuilder.homeScreen(route: String) {
                     onSuccess = {
                         homeViewModel.startTranscription(
                             currentCameraImageProxy = it,
-                            onEndOfSpeech = { /* TODO: navigate to chat screen*/ }
+                            onEndOfSpeech = { transcription, associatedBitmapUri -> TODO() }
                         )
                     },
                     onError = { /*TODO*/ }
