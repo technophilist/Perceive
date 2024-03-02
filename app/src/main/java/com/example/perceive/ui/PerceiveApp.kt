@@ -77,3 +77,19 @@ private fun NavGraphBuilder.homeScreen(route: String) {
         )
     }
 }
+
+private fun NavGraphBuilder.chatScreen(route: String, navController: NavController) {
+    composable(route = route) {
+        val viewModel = hiltViewModel<ChatViewModel>()
+        val currentUserTranscription by viewModel.userSpeechTranscriptionStream.collectAsStateWithLifecycle()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        ChatScreen(
+            isAssistantResponseLoading = uiState.isLoading,
+            chatMessages = uiState.messages,
+            currentTranscription = currentUserTranscription,
+            isListening = uiState.isListening,
+            onStartListening = viewModel::startTranscription,
+            onBackButtonClick = navController::popBackStack // todo(fix this):this not recommended way to navigate back
+        )
+    }
+}
