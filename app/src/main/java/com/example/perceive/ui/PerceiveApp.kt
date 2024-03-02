@@ -2,6 +2,7 @@ package com.example.perceive.ui
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.camera.view.LifecycleCameraController
@@ -47,17 +48,33 @@ fun PerceiveApp(navHostController: NavHostController = rememberNavController()) 
                 }
             )
         }
-        homeScreen(route = PerceiveNavigationDestinations.HomeScreen.route)
+        homeScreen(
+            route = PerceiveNavigationDestinations.HomeScreen.route,
+            navController = navHostController
+        )
+        chatScreen(
+            route = PerceiveNavigationDestinations.ChatScreen.route,
+            navController = navHostController
+        )
     }
 }
 
-private fun NavGraphBuilder.homeScreen(route: String) {
+private fun NavGraphBuilder.homeScreen(navController: NavController, route: String) {
     composable(route = route) {
         val context = LocalContext.current
         val homeViewModel = hiltViewModel<HomeViewModel>()
         val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
         val cameraController = remember { LifecycleCameraController(context) }
         val transcription by homeViewModel.userSpeechTranscriptionStream.collectAsStateWithLifecycle()
+        val onEndOfSpeech = remember {
+            { transcription: String, associatedBitmapUri: Uri ->
+                navController.navigate(
+                    PerceiveNavigationDestinations
+                        .ChatScreen
+                        .buildRoute(transcription, associatedBitmapUri)
+                )
+            }
+        }
         HomeScreen(
             cameraController = cameraController,
             transcriptionText = transcription,
@@ -68,7 +85,7 @@ private fun NavGraphBuilder.homeScreen(route: String) {
                     onSuccess = {
                         homeViewModel.startTranscription(
                             currentCameraImageProxy = it,
-                            onEndOfSpeech = { transcription, associatedBitmapUri -> TODO() }
+                            onEndOfSpeech = onEndOfSpeech
                         )
                     },
                     onError = { /*TODO*/ }
