@@ -3,6 +3,7 @@ package com.example.perceive.ui.components
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -36,8 +37,8 @@ enum class Role {
 @Composable
 fun ChatMessageCard(messageContent: String, role: Role, modifier: Modifier = Modifier) {
     val shape = remember(role) {
-        if (role == Role.USER) CircleShape.copy(topEnd = CornerSize(0.dp))
-        else CircleShape.copy(topStart = CornerSize(0.dp))
+        if (role == Role.USER) RoundedCornerShape(50.dp).copy(topEnd = CornerSize(0.dp))
+        else RoundedCornerShape(50.dp).copy(topStart = CornerSize(0.dp))
     }
     OutlinedCard(
         modifier = modifier,
