@@ -47,7 +47,10 @@ class HomeViewModel @Inject constructor(
                     val associatedBitmapUri =
                         rotateImageProxyToCorrectOrientation(currentCameraImageProxy)
                             ?: return@launch // todo: error handling
-                    _uiState.update { HomeScreenUiState() } // reset state to defaults
+                    // reset states to defaults
+                    _uiState.update { HomeScreenUiState() }
+                    _userSpeechTranscriptionStream.value = null
+                    // invoke callback in the main thread
                     withContext(Dispatchers.Main.immediate) {
                         onEndOfSpeech(transcription, associatedBitmapUri)
                     }
