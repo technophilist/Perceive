@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.perceive.data.local.bitmapstore.AndroidBitmapStore
 import com.example.perceive.data.local.bitmapstore.BitmapStore
 import com.example.perceive.data.remote.languagemodel.MultiModalLanguageModelClient
 import com.example.perceive.domain.chat.ChatMessage
@@ -79,10 +78,18 @@ class ChatViewModel @Inject constructor(
         transcriptionService.startListening(
             transcription = { transcription -> _userSpeechTranscriptionStream.update { transcription } },
             onEndOfSpeech = {
-                _uiState.update { it.copy(isListening = false) }
                 val userTranscription =
                     _userSpeechTranscriptionStream.value ?: return@startListening
                 if (userTranscription.isBlank()) return@startListening
+                val userTranscriptionChatMessageList = listOf(
+                    ChatMessage(message = userTranscription, role = ChatMessage.Role.USER)
+                )
+                _uiState.update {
+                    it.copy(
+                        isListening = false,
+                        messages = it.messages + userTranscriptionChatMessageList
+                    )
+                }
                 generateResponseAndUpdateUiState(userTranscription)
             },
             onError = { _uiState.update { it.copy(isListening = false, hasErrorOccurred = true) } }
