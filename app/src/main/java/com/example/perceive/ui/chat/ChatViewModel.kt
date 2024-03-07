@@ -78,17 +78,17 @@ class ChatViewModel @Inject constructor(
         transcriptionService.startListening(
             transcription = { transcription -> _userSpeechTranscriptionStream.update { transcription } },
             onEndOfSpeech = {
+                _uiState.update { it.copy(isListening = false) }
                 val userTranscription =
                     _userSpeechTranscriptionStream.value ?: return@startListening
                 if (userTranscription.isBlank()) return@startListening
+                // before adding the transcription to the chat, clear the transcription stream
+                _userSpeechTranscriptionStream.update { null }
                 val userTranscriptionChatMessageList = listOf(
                     ChatMessage(message = userTranscription, role = ChatMessage.Role.USER)
                 )
                 _uiState.update {
-                    it.copy(
-                        isListening = false,
-                        messages = it.messages + userTranscriptionChatMessageList
-                    )
+                    it.copy(messages = it.messages + userTranscriptionChatMessageList)
                 }
                 generateResponseAndUpdateUiState(userTranscription)
             },
