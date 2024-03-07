@@ -56,8 +56,15 @@ class GeminiLanguageModelClient @Inject constructor() : MultiModalLanguageModelC
             val prompt = content(GeminiRoles.USER) {
                 descriptionOfImages?.let {
                     text(
-                        "Given the following description of image(s), answer the question(s) that follow, in a conversational manner." +
-                                "Try to answer without using sentences that contain the word \"photo\"."
+                        """
+                            |You are an assistant allowing a user to point at something and ask questions about it.
+                            |Based off of the following description of what the user is seeing right now,
+                            |answer the question(s). Generate answers in a way that makes the 
+                            |user feel as if you are with them, looking at the thing that they 
+                            |are pointing to. Do not generate answers that suggest that you are 
+                            |using descriptions of the images of what the user is seeing to 
+                            |generate the response.
+                        """.trimMargin()
                     )
                     text(it)
                 }
