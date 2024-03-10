@@ -2,6 +2,7 @@ package com.example.perceive.di
 
 import com.example.perceive.domain.speech.AndroidTranscriptionService
 import com.example.perceive.domain.speech.TranscriptionService
+import com.example.perceive.domain.speech.tts.AndroidTextToSpeechService
 import com.example.perceive.domain.speech.tts.TextToSpeechService
 import dagger.Binds
 import dagger.Module
@@ -19,5 +20,5 @@ abstract class SpeechModule {
 
     @Binds
     @Singleton
-    abstract fun bindTextToSpeechService(impl: AndroidTranscriptionService): TextToSpeechService
+    abstract fun bindTextToSpeechService(impl: AndroidTextToSpeechService): TextToSpeechService
 }
