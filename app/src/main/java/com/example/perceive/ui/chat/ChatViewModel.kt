@@ -96,6 +96,9 @@ class ChatViewModel @Inject constructor(
         )
     }
 
+    fun onAssistantMutedStateChange(isMuted: Boolean) {
+        _uiState.update { it.copy(isAssistantMuted = isMuted) }
+    }
 
     private fun generateResponseAndUpdateUiState(message: String) {
         viewModelScope.launch {
