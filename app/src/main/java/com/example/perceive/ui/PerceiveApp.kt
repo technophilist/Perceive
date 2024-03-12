@@ -106,6 +106,8 @@ private fun NavGraphBuilder.chatScreen(route: String, navController: NavControll
             currentTranscription = currentUserTranscription,
             isListening = uiState.isListening,
             onStartListening = viewModel::startTranscription,
+            isAssistantMuted = uiState.isAssistantMuted,
+            onAssistantMutedChange = viewModel::onAssistantMutedStateChange,
             onBackButtonClick = navController::popBackStack // todo(fix this):this not recommended way to navigate back
         )
     }
