@@ -10,6 +10,7 @@ import com.example.perceive.domain.chat.ChatMessage
 import com.example.perceive.domain.speech.TranscriptionService
 import com.example.perceive.ui.navigation.PerceiveNavigationDestinations
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -45,31 +46,7 @@ class ChatViewModel @Inject constructor(
 
     init {
         languageModelClient.startNewChatSession()
-        _uiState.update {
-            it.copy(isLoading = true, messages = listOf(initialUserChatMessage))
-        }
-        // generate response for initial prompt and image
-        viewModelScope.launch {
-            val initialBitmap = bitmapStore
-                .retrieveBitmapForUri(conversationImageBitmapUri)
-                ?: return@launch // todo: error handling / delete image after using it
-            val messageToModel = listOf(
-                MultiModalLanguageModelClient.MessageContent.Image(initialBitmap),
-                MultiModalLanguageModelClient.MessageContent.Text(text = initialUserChatMessage.message),
-            )
-            val response = languageModelClient.sendMessage(messageToModel).getOrNull()?.let {
-                ChatMessage(
-                    message = it,
-                    role = ChatMessage.Role.ASSISTANT
-                )
-            }?.let(::listOf)
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    messages = it.messages + (response ?: emptyList())
-                )
-            }
-        }
+        generateResponseForInitialPromptAndImage()
     }
 
     fun startTranscription() {
@@ -79,44 +56,62 @@ class ChatViewModel @Inject constructor(
             transcription = { transcription -> _userSpeechTranscriptionStream.update { transcription } },
             onEndOfSpeech = {
                 _uiState.update { it.copy(isListening = false) }
-                val userTranscription =
-                    _userSpeechTranscriptionStream.value ?: return@startListening
-                if (userTranscription.isBlank()) return@startListening
-                // before adding the transcription to the chat, clear the transcription stream
-                _userSpeechTranscriptionStream.update { null }
-                val userTranscriptionChatMessageList = listOf(
-                    ChatMessage(message = userTranscription, role = ChatMessage.Role.USER)
-                )
-                _uiState.update {
-                    it.copy(messages = it.messages + userTranscriptionChatMessageList)
-                }
-                generateResponseAndUpdateUiState(userTranscription)
+                processTranscriptionAndGenerateResponse()
             },
             onError = { _uiState.update { it.copy(isListening = false, hasErrorOccurred = true) } }
         )
+    }
+
+    private fun processTranscriptionAndGenerateResponse() {
+        val userTranscription =
+            _userSpeechTranscriptionStream.value ?: return
+        if (userTranscription.isBlank()) return
+        // before adding the transcription to the chat, clear the transcription stream
+        _userSpeechTranscriptionStream.update { null }
+        val userTranscriptionChatMessage = ChatMessage(
+            message = userTranscription,
+            role = ChatMessage.Role.USER
+        )
+        _uiState.update {
+            it.copy(messages = it.messages + userTranscriptionChatMessage)
+        }
+        val messageToModel = listOf(
+            MultiModalLanguageModelClient.MessageContent.Text(text = userTranscription)
+        )
+        generateLanguageModelResponseUpdatingUiState(messageToModel)
     }
 
     fun onAssistantMutedStateChange(isMuted: Boolean) {
         _uiState.update { it.copy(isAssistantMuted = isMuted) }
     }
 
-    private fun generateResponseAndUpdateUiState(message: String) {
+    private fun generateResponseForInitialPromptAndImage() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(messages = listOf(initialUserChatMessage)) }
+            val initialBitmap = bitmapStore
+                .retrieveBitmapForUri(conversationImageBitmapUri)
+                ?: return@launch // todo: error handling / delete image after using it
+            val messageToModel = listOf(
+                MultiModalLanguageModelClient.MessageContent.Image(initialBitmap),
+                MultiModalLanguageModelClient.MessageContent.Text(text = initialUserChatMessage.message),
+            )
+            generateLanguageModelResponseUpdatingUiState(messageToModel)
+        }
+    }
+
+    private fun generateLanguageModelResponseUpdatingUiState(messageToModel: List<MultiModalLanguageModelClient.MessageContent>) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val messageToModel = listOf(
-                MultiModalLanguageModelClient.MessageContent.Text(text = message)
-            )
-            val response = languageModelClient.sendMessage(messageToModel).getOrNull()?.let {
-                ChatMessage(
-                    message = it,
-                    role = ChatMessage.Role.ASSISTANT
-                )
-            }?.let(::listOf)
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    messages = it.messages + (response ?: emptyList())
-                )
+            try {
+                val response = languageModelClient.sendMessage(messageToModel)
+                    .getOrThrow()
+                    .let { ChatMessage(message = it, role = ChatMessage.Role.ASSISTANT) }
+                _uiState.update { it.copy(messages = it.messages + response) }
+            } catch (exception: Exception) {
+                if (exception is CancellationException) throw exception
+                _uiState.update { it.copy(hasErrorOccurred = true) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
