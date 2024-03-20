@@ -16,7 +16,9 @@ class AndroidTextToSpeechService @Inject constructor(
     @ApplicationContext private val context: Context
 ) : TextToSpeechService {
 
-    private var textToSpeech: TextToSpeech? = null
+    private var textToSpeech: TextToSpeech = TextToSpeech(context) {
+        if (it == TextToSpeech.ERROR) throw Exception("An error occurred while initializing the text-to-speech engine")
+    }
 
     override fun startSpeaking(
         text: String,
@@ -27,20 +29,14 @@ class AndroidTextToSpeechService @Inject constructor(
             onFailure(IllegalArgumentException("The text length is larger than the max supported speech input length"))
             return
         }
-        textToSpeech = TextToSpeech(context) { status ->
-            if (status != TextToSpeech.SUCCESS) {
-                onFailure(Exception("Failed to initialize TextToSpeech"))
-                return@TextToSpeech
-            }
-            textToSpeech?.language = Locale.US
-            val speakResult = textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, null, null)
-            if (speakResult == TextToSpeech.ERROR) onFailure(Exception("An internal error occurred while attempting to speak"))
-            else onSuccess?.invoke()
-        }
+        textToSpeech.language = Locale.US
+        val speakResult = textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        if (speakResult == TextToSpeech.ERROR) onFailure(Exception("An internal error occurred while attempting to speak"))
+        else onSuccess?.invoke()
     }
 
     override fun stopSpeakingAndClearResources() {
-        textToSpeech?.stop()
-        textToSpeech?.shutdown()
+        textToSpeech.stop()
+        textToSpeech.shutdown()
     }
 }
