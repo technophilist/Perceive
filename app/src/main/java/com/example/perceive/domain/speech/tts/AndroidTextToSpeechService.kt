@@ -2,6 +2,7 @@ package com.example.perceive.domain.speech.tts
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.util.Locale
@@ -12,7 +13,7 @@ import javax.inject.Inject
  * to speak text.
  */
 class AndroidTextToSpeechService @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) : TextToSpeechService {
 
     private var textToSpeech: TextToSpeech? = null
