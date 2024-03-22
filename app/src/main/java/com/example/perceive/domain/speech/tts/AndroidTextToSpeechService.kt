@@ -3,6 +3,7 @@ package com.example.perceive.domain.speech.tts
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CompletableDeferred
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.util.Locale
@@ -15,18 +16,25 @@ import javax.inject.Inject
 class AndroidTextToSpeechService @Inject constructor(
     @ApplicationContext private val context: Context
 ) : TextToSpeechService {
-
+    private val didTextToSpeechInitializeSuccessfully = CompletableDeferred<Boolean>()
     private var textToSpeech: TextToSpeech = TextToSpeech(context) {
-        if (it == TextToSpeech.ERROR) throw Exception("An error occurred while initializing the text-to-speech engine")
+        if (it == TextToSpeech.ERROR) didTextToSpeechInitializeSuccessfully.complete(false)
+        else didTextToSpeechInitializeSuccessfully.complete(true)
     }
 
-    override fun startSpeaking(
+    override suspend fun startSpeaking(
         text: String,
         onFailure: (Exception) -> Unit,
         onSuccess: (() -> Unit)?
     ) {
         if (text.length > TextToSpeech.getMaxSpeechInputLength()) {
             onFailure(IllegalArgumentException("The text length is larger than the max supported speech input length"))
+            return
+        }
+        // wait for tts engine to initialize
+        val wasTtsInitializedSuccessfully = didTextToSpeechInitializeSuccessfully.await()
+        if (!wasTtsInitializedSuccessfully) {
+            onFailure(Exception("An internal error occurred when trying to initialize TTS engine."))
             return
         }
         textToSpeech.language = Locale.US

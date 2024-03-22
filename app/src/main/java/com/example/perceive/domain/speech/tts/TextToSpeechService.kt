@@ -14,7 +14,11 @@ interface TextToSpeechService {
      * @param onFailure A callback that is invoked if an error occurs while attempting to speak.
      * @param onSuccess A callback that is invoked if the text is successfully spoken.
      */
-    fun startSpeaking(text: String, onFailure: (Exception) -> Unit, onSuccess: (() -> Unit)? = null)
+    suspend fun startSpeaking(
+        text: String,
+        onFailure: (Exception) -> Unit,
+        onSuccess: (() -> Unit)? = null
+    )
 
     /**
      * Stops speaking and clears resources.
