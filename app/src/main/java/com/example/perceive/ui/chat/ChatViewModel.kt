@@ -8,6 +8,7 @@ import com.example.perceive.data.local.bitmapstore.BitmapStore
 import com.example.perceive.data.remote.languagemodel.MultiModalLanguageModelClient
 import com.example.perceive.domain.chat.ChatMessage
 import com.example.perceive.domain.speech.TranscriptionService
+import com.example.perceive.domain.speech.tts.TextToSpeechService
 import com.example.perceive.ui.navigation.PerceiveNavigationDestinations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val transcriptionService: TranscriptionService,
+    private val textToSpeechService: TextToSpeechService,
     private val languageModelClient: MultiModalLanguageModelClient,
     private val bitmapStore: BitmapStore,
     savedStateHandle: SavedStateHandle,
@@ -78,11 +80,15 @@ class ChatViewModel @Inject constructor(
         val messageToModel = listOf(
             MultiModalLanguageModelClient.MessageContent.Text(text = userTranscription)
         )
-        generateLanguageModelResponseUpdatingUiState(messageToModel)
+        generateLanguageModelResponseUpdatingUiState(
+            messageToModel = messageToModel,
+            isAssistantMuted = _uiState.value.isAssistantMuted
+        )
     }
 
     fun onAssistantMutedStateChange(isMuted: Boolean) {
         _uiState.update { it.copy(isAssistantMuted = isMuted) }
+        // todo: if assitant is speaking and the user mutes the assistant, it should immediately stop.
     }
 
     private fun generateResponseForInitialPromptAndImage() {
@@ -95,11 +101,17 @@ class ChatViewModel @Inject constructor(
                 MultiModalLanguageModelClient.MessageContent.Image(initialBitmap),
                 MultiModalLanguageModelClient.MessageContent.Text(text = initialUserChatMessage.message),
             )
-            generateLanguageModelResponseUpdatingUiState(messageToModel)
+            generateLanguageModelResponseUpdatingUiState(
+                messageToModel = messageToModel,
+                isAssistantMuted = _uiState.value.isAssistantMuted
+            )
         }
     }
 
-    private fun generateLanguageModelResponseUpdatingUiState(messageToModel: List<MultiModalLanguageModelClient.MessageContent>) {
+    private fun generateLanguageModelResponseUpdatingUiState(
+        messageToModel: List<MultiModalLanguageModelClient.MessageContent>,
+        isAssistantMuted: Boolean
+    ) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
@@ -107,6 +119,9 @@ class ChatViewModel @Inject constructor(
                     .getOrThrow()
                     .let { ChatMessage(message = it, role = ChatMessage.Role.ASSISTANT) }
                 _uiState.update { it.copy(messages = it.messages + response) }
+                if (!isAssistantMuted) {
+                    textToSpeechService.startSpeaking(response.message, {})
+                }
             } catch (exception: Exception) {
                 if (exception is CancellationException) throw exception
                 _uiState.update { it.copy(hasErrorOccurred = true) }
