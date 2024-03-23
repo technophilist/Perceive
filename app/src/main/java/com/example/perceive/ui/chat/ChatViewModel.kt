@@ -88,7 +88,7 @@ class ChatViewModel @Inject constructor(
 
     fun onAssistantMutedStateChange(isMuted: Boolean) {
         _uiState.update { it.copy(isAssistantMuted = isMuted) }
-        // todo: if assitant is speaking and the user mutes the assistant, it should immediately stop.
+        if (isMuted) textToSpeechService.stop()
     }
 
     private fun generateResponseForInitialPromptAndImage() {
@@ -133,6 +133,8 @@ class ChatViewModel @Inject constructor(
 
     override fun onCleared() {
         languageModelClient.endChatSession()
+        textToSpeechService.stop()
+        textToSpeechService.releaseResources()
         super.onCleared()
     }
 }
