@@ -28,8 +28,17 @@ class AndroidTextToSpeechService @Inject constructor(
             onFailure(IllegalArgumentException("The text length is larger than the max supported speech input length"))
             return
         }
+
+        if (textToSpeech == null) {
+            textToSpeech = TextToSpeech(context) {
+                if (it == TextToSpeech.ERROR) didTextToSpeechInitializeSuccessfully.complete(false)
+                else didTextToSpeechInitializeSuccessfully.complete(true)
+            }
+        }
+
         // wait for tts engine to initialize
         val wasTtsInitializedSuccessfully = didTextToSpeechInitializeSuccessfully.await()
+
         if (!wasTtsInitializedSuccessfully) {
             onFailure(Exception("An internal error occurred when trying to initialize TTS engine."))
             return
@@ -40,21 +49,12 @@ class AndroidTextToSpeechService @Inject constructor(
         else onSuccess?.invoke()
     }
 
-    private fun initTextToSpeech() {
-        textToSpeech = TextToSpeech(context) {
-            if (it == TextToSpeech.ERROR) didTextToSpeechInitializeSuccessfully.complete(false)
-            else didTextToSpeechInitializeSuccessfully.complete(true)
-        }
-    }
-
     override fun stop() {
-        textToSpeech?.run {
-            if (!isSpeaking) return@run
-            stop()
-        }
+        textToSpeech?.run { if (isSpeaking) stop() }
     }
 
     override fun releaseResources() {
         textToSpeech?.shutdown()
+        textToSpeech = null
     }
 }
