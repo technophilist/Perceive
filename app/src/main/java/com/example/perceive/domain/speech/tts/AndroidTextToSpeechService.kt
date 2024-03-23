@@ -17,10 +17,7 @@ class AndroidTextToSpeechService @Inject constructor(
     @ApplicationContext private val context: Context
 ) : TextToSpeechService {
     private val didTextToSpeechInitializeSuccessfully = CompletableDeferred<Boolean>()
-    private var textToSpeech: TextToSpeech = TextToSpeech(context) {
-        if (it == TextToSpeech.ERROR) didTextToSpeechInitializeSuccessfully.complete(false)
-        else didTextToSpeechInitializeSuccessfully.complete(true)
-    }
+    private var textToSpeech: TextToSpeech? = null
 
     override suspend fun startSpeaking(
         text: String,
@@ -37,23 +34,27 @@ class AndroidTextToSpeechService @Inject constructor(
             onFailure(Exception("An internal error occurred when trying to initialize TTS engine."))
             return
         }
-        textToSpeech.language = Locale.US
-        val speakResult = textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        textToSpeech?.language = Locale.US
+        val speakResult = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
         if (speakResult == TextToSpeech.ERROR) onFailure(Exception("An internal error occurred while attempting to speak"))
         else onSuccess?.invoke()
     }
 
+    private fun initTextToSpeech() {
+        textToSpeech = TextToSpeech(context) {
+            if (it == TextToSpeech.ERROR) didTextToSpeechInitializeSuccessfully.complete(false)
+            else didTextToSpeechInitializeSuccessfully.complete(true)
+        }
+    }
+
     override fun stop() {
-        if (!textToSpeech.isSpeaking) return
-        textToSpeech.stop()
+        textToSpeech?.run {
+            if (!isSpeaking) return@run
+            stop()
+        }
     }
 
     override fun releaseResources() {
-        textToSpeech.shutdown()
-    }
-
-    override fun stopSpeakingAndClearResources() {
-        textToSpeech.stop()
-        textToSpeech.shutdown()
+        textToSpeech?.shutdown()
     }
 }

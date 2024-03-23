@@ -24,13 +24,7 @@ interface TextToSpeechService {
      * Stops speaking if the service is currently speaking.
      */
     fun stop()
-
-    /**
-     * Stops speaking and clears resources.
-     */
-    @Deprecated("Use stop() and releaseResources() method")
-    fun stopSpeakingAndClearResources()
-
+    
     /**
      * Used to release all resources held by a particular instance. The instance
      * cannot be reused. In other words, a new instance needs to be created
