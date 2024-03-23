@@ -1,7 +1,7 @@
 package com.example.perceive.di
 
-import com.example.perceive.domain.speech.AndroidTranscriptionService
-import com.example.perceive.domain.speech.TranscriptionService
+import com.example.perceive.domain.speech.transcription.AndroidTranscriptionService
+import com.example.perceive.domain.speech.transcription.TranscriptionService
 import com.example.perceive.domain.speech.tts.AndroidTextToSpeechService
 import com.example.perceive.domain.speech.tts.TextToSpeechService
 import dagger.Binds

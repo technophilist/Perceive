@@ -1,11 +1,9 @@
-package com.example.perceive.domain.speech
+package com.example.perceive.domain.speech.transcription
 
 import android.content.Context
 import android.content.Intent
-import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
-import android.util.Log
 import com.example.perceive.utils.createRecognitionListener
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

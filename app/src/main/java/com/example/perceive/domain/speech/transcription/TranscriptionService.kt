@@ -1,4 +1,4 @@
-package com.example.perceive.domain.speech
+package com.example.perceive.domain.speech.transcription
 
 /**
  * A service that listens to the user's speech and transcribes it.

@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.perceive.data.local.bitmapstore.BitmapStore
 import com.example.perceive.data.remote.languagemodel.MultiModalLanguageModelClient
 import com.example.perceive.domain.chat.ChatMessage
-import com.example.perceive.domain.speech.TranscriptionService
+import com.example.perceive.domain.speech.transcription.TranscriptionService
 import com.example.perceive.domain.speech.tts.TextToSpeechService
 import com.example.perceive.ui.navigation.PerceiveNavigationDestinations
 import dagger.hilt.android.lifecycle.HiltViewModel
