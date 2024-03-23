@@ -43,6 +43,15 @@ class AndroidTextToSpeechService @Inject constructor(
         else onSuccess?.invoke()
     }
 
+    override fun stop() {
+        if (!textToSpeech.isSpeaking) return
+        textToSpeech.stop()
+    }
+
+    override fun releaseResources() {
+        textToSpeech.shutdown()
+    }
+
     override fun stopSpeakingAndClearResources() {
         textToSpeech.stop()
         textToSpeech.shutdown()
