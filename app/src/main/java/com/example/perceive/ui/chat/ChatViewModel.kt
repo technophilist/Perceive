@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.perceive.data.local.bitmapstore.BitmapStore
 import com.example.perceive.data.remote.languagemodel.MultiModalLanguageModelClient
 import com.example.perceive.domain.chat.ChatMessage
+import com.example.perceive.domain.sound.UISoundPlayer
 import com.example.perceive.domain.speech.transcription.TranscriptionService
 import com.example.perceive.domain.speech.tts.TextToSpeechService
 import com.example.perceive.ui.navigation.PerceiveNavigationDestinations
@@ -24,6 +25,7 @@ class ChatViewModel @Inject constructor(
     private val transcriptionService: TranscriptionService,
     private val textToSpeechService: TextToSpeechService,
     private val languageModelClient: MultiModalLanguageModelClient,
+    private val uiSoundPlayer: UISoundPlayer,
     private val bitmapStore: BitmapStore,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -88,7 +90,12 @@ class ChatViewModel @Inject constructor(
 
     fun onAssistantMutedStateChange(isMuted: Boolean) {
         _uiState.update { it.copy(isAssistantMuted = isMuted) }
-        if (isMuted) textToSpeechService.stop()
+        if (isMuted) {
+            uiSoundPlayer.playSound(UISoundPlayer.UISound.ASSISTANT_MUTED)
+            textToSpeechService.stop()
+        } else {
+            uiSoundPlayer.playSound(UISoundPlayer.UISound.ASSISTANT_UNMUTED)
+        }
     }
 
     private fun generateResponseForInitialPromptAndImage() {
