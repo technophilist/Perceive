@@ -26,6 +26,9 @@ junit = "4.13.2"
 # sdk for google's gemini models
 generativeai = "0.2.0"
 
+# datastore
+preferences-datastore = "1.0.0"
+
 # plugins
 agp = "8.2.1"
 kotlin = "1.9.0"
@@ -61,6 +64,9 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 
 # sdk for google's gemini models
 generativeai = { module = "com.google.ai.client.generativeai:generativeai", version.ref = "generativeai" }
+
+# preferences data store
+androidx-preferences-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "preferences-datastore" }
 
 # coroutines-test
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-test" }

@@ -97,6 +97,9 @@ dependencies {
 
     // coroutines-test
     testImplementation(libs.kotlinx.coroutines.test)
+
+    // datastore
+    implementation(libs.androidx.preferences.datastore)
 }
 kapt {
     correctErrorTypes = true
