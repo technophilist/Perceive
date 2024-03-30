@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.perceive.data.local.bitmapstore.BitmapStore
-import com.example.perceive.data.preferences.UserPreferencesManager
+import com.example.perceive.data.local.preferences.UserPreferencesManager
 import com.example.perceive.data.remote.languagemodel.MultiModalLanguageModelClient
 import com.example.perceive.domain.chat.ChatMessage
 import com.example.perceive.domain.sound.UISoundPlayer

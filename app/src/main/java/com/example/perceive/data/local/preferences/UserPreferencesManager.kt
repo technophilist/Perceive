@@ -1,4 +1,4 @@
-package com.example.perceive.data.preferences
+package com.example.perceive.data.local.preferences
 
 import kotlinx.coroutines.flow.Flow
 

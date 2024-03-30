@@ -5,8 +5,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.example.perceive.data.preferences.PerceiveUserPreferencesManager
-import com.example.perceive.data.preferences.UserPreferencesManager
+import com.example.perceive.data.local.preferences.PerceiveUserPreferencesManager
+import com.example.perceive.data.local.preferences.UserPreferencesManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

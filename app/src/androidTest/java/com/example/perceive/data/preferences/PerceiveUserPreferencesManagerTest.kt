@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.perceive.data.local.preferences.PerceiveUserPreferencesManager
 import com.example.perceive.di.PerceiveApplication
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
