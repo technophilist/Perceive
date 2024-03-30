@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.perceive.data.local.bitmapstore.BitmapStore
+import com.example.perceive.data.preferences.UserPreferencesManager
 import com.example.perceive.data.remote.languagemodel.MultiModalLanguageModelClient
 import com.example.perceive.domain.chat.ChatMessage
 import com.example.perceive.domain.sound.UISoundPlayer
@@ -15,6 +16,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Base64
@@ -27,6 +30,7 @@ class ChatViewModel @Inject constructor(
     private val languageModelClient: MultiModalLanguageModelClient,
     private val uiSoundPlayer: UISoundPlayer,
     private val bitmapStore: BitmapStore,
+    private val preferencesManager: UserPreferencesManager,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -49,6 +53,13 @@ class ChatViewModel @Inject constructor(
     val userSpeechTranscriptionStream = _userSpeechTranscriptionStream.asStateFlow()
 
     init {
+        preferencesManager.preferencesStream
+            .onEach { perceiveAppPreferences ->
+                _uiState.update {
+                    it.copy(isAssistantMuted = perceiveAppPreferences.isAssistantMuted)
+                }
+            }.launchIn(viewModelScope)
+
         languageModelClient.startNewChatSession()
         generateResponseForInitialPromptAndImage()
     }
@@ -90,6 +101,7 @@ class ChatViewModel @Inject constructor(
 
     fun onAssistantMutedStateChange(isMuted: Boolean) {
         _uiState.update { it.copy(isAssistantMuted = isMuted) }
+        viewModelScope.launch { preferencesManager.setAssistantMutedStatus(isMuted) }
         if (isMuted) {
             uiSoundPlayer.playSound(UISoundPlayer.UISound.ASSISTANT_MUTED)
             textToSpeechService.stop()
