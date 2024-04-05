@@ -15,4 +15,9 @@ interface UserPreferencesManager {
      * Sets the assistant muted status.
      */
     suspend fun setAssistantMutedStatus(isAssistantMuted: Boolean)
+
+    /**
+     * Sets the welcome screen visibility status.
+     */
+    suspend fun setWelcomeScreenVisibilityStatus(shouldShowWelcomeScreen: Boolean)
 }

@@ -38,6 +38,10 @@ class PerceiveUserPreferencesManager @Inject constructor(
         dataStore.edit { it[DatastoreKeys.IS_ASSISTANT_MUTED] = isAssistantMuted }
     }
 
+    override suspend fun setWelcomeScreenVisibilityStatus(shouldShowWelcomeScreen: Boolean) {
+        dataStore.edit { it[DatastoreKeys.SHOULD_SHOW_WELCOME_SCREEN] = shouldShowWelcomeScreen }
+    }
+
     private object DatastoreKeys {
         val IS_ASSISTANT_MUTED = booleanPreferencesKey("is_assistant_muted")
         val SHOULD_SHOW_WELCOME_SCREEN = booleanPreferencesKey("should_show_welcome_screen")
