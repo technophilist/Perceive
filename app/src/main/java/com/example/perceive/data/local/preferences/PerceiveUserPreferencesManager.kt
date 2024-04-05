@@ -26,7 +26,12 @@ class PerceiveUserPreferencesManager @Inject constructor(
         }
         .map { preferences ->
             val isAssistantMuted = preferences[DatastoreKeys.IS_ASSISTANT_MUTED] ?: false
-            PerceiveAppPreferences(isAssistantMuted = isAssistantMuted)
+            val shouldShowWelcomeScreen =
+                preferences[DatastoreKeys.SHOULD_SHOW_WELCOME_SCREEN] ?: true
+            PerceiveAppPreferences(
+                isAssistantMuted = isAssistantMuted,
+                shouldShowWelcomeScreen = shouldShowWelcomeScreen
+            )
         }
 
     override suspend fun setAssistantMutedStatus(isAssistantMuted: Boolean) {
@@ -35,5 +40,6 @@ class PerceiveUserPreferencesManager @Inject constructor(
 
     private object DatastoreKeys {
         val IS_ASSISTANT_MUTED = booleanPreferencesKey("is_assistant_muted")
+        val SHOULD_SHOW_WELCOME_SCREEN = booleanPreferencesKey("should_show_welcome_screen")
     }
 }
