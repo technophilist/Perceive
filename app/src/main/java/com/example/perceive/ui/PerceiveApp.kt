@@ -1,42 +1,16 @@
 package com.example.perceive.ui
 
 import android.Manifest
-import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.Settings
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -54,11 +28,14 @@ import com.example.perceive.ui.home.HomeViewModel
 import com.example.perceive.ui.navigation.PerceiveNavigationDestinations
 import com.example.perceive.ui.onboarding.WelcomeScreen
 import com.example.perceive.ui.permission.PermissionsDeniedScreen
-import com.example.perceive.utils.createRecognitionListener
 import com.example.perceive.utils.takePicture
 
 @Composable
-fun PerceiveApp(navHostController: NavHostController = rememberNavController()) {
+fun PerceiveApp(
+    navHostController: NavHostController = rememberNavController(),
+    shouldShowWelcomeScreen: Boolean = true,
+    onNavigateToHomeScreen: () -> Unit = {}
+) {
     var isRequiredPermissionsGranted by remember { mutableStateOf<Boolean?>(null) }
     val permissionsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -81,13 +58,15 @@ fun PerceiveApp(navHostController: NavHostController = rememberNavController()) 
     if (isRequiredPermissionsGranted == true) {
         NavHost(
             navController = navHostController,
-            startDestination = PerceiveNavigationDestinations.HomeScreen.route
+            startDestination = if (shouldShowWelcomeScreen) PerceiveNavigationDestinations.WelcomeScreen.route
+            else PerceiveNavigationDestinations.HomeScreen.route
         ) {
             composable(route = PerceiveNavigationDestinations.WelcomeScreen.route) {
                 // TODO: make welcome screen visible only once
                 WelcomeScreen(
                     onNavigateToHomeScreenButtonClick = {
                         navHostController.navigate(PerceiveNavigationDestinations.HomeScreen.route)
+                        onNavigateToHomeScreen()
                     }
                 )
             }
