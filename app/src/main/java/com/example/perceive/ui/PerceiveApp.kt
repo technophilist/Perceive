@@ -62,7 +62,8 @@ fun PerceiveApp(
             else PerceiveNavigationDestinations.HomeScreen.route
         ) {
             composable(route = PerceiveNavigationDestinations.WelcomeScreen.route) {
-                // TODO: make welcome screen visible only once
+                // no need to use popUpTo because shouldShowWelcomeScreen boolean will take
+                // care of it.
                 WelcomeScreen(
                     onNavigateToHomeScreenButtonClick = {
                         navHostController.navigate(PerceiveNavigationDestinations.HomeScreen.route)
