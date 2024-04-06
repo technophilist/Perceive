@@ -88,3 +88,16 @@ fun AnimatedMicButton(
         )
     }
 }
+
+@PreviewLightDark
+@PreviewDynamicColors
+@Composable
+private fun AnimatedMicButtonPreview() {
+    PerceiveTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background,
+            content = { AnimatedMicButton(isAnimationRunning = false, onClick = {}) }
+        )
+    }
+}
