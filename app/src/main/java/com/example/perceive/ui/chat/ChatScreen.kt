@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -40,12 +41,16 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.perceive.R
 import com.example.perceive.domain.chat.ChatMessage
 import com.example.perceive.ui.components.AnimatedMicButtonWithTranscript
 import com.example.perceive.ui.components.ChatMessageCard
 import com.example.perceive.ui.components.Role
+import com.example.perceive.ui.onboarding.WelcomeScreen
+import com.example.perceive.ui.theme.PerceiveTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -219,5 +224,40 @@ private class ChatScreenHaptics(
 
     fun provideUnMutedHapticFeedback() {
         localHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+    }
+}
+
+
+@PreviewLightDark
+@PreviewDynamicColors
+@Composable
+private fun ChatScreenPreview() {
+    PerceiveTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            ChatScreen(
+                isAssistantResponseLoading = false,
+                chatMessages = listOf(
+                    ChatMessage(
+                        id = "1",
+                        message = "Hello, how can I help you?",
+                        role = ChatMessage.Role.ASSISTANT
+                    ),
+                    ChatMessage(
+                        id = "2",
+                        message = "I'm looking for a good place to eat",
+                        role = ChatMessage.Role.USER
+                    )
+                ),
+                currentTranscription = "I'm looking for a good place to eat",
+                isListening = false,
+                onStartListening = {},
+                isAssistantMuted = false,
+                onAssistantMutedChange = {},
+                onBackButtonClick = {}
+            )
+        }
     }
 }
