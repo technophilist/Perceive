@@ -1,12 +1,14 @@
 package com.example.perceive.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,8 +22,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.perceive.R
+import com.example.perceive.ui.onboarding.WelcomeScreen
+import com.example.perceive.ui.theme.PerceiveTheme
 import com.example.perceive.ui.theme.RoundedStarShape
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -34,6 +40,7 @@ import kotlinx.coroutines.launch
  * @param onClick callback to invoked when the button is clicked.
  * @param modifier [Modifier] to be applied to the composable.
  */
+//  todo: fix AnimatedMicButton anim after 1full rotation
 @Composable
 fun AnimatedMicButton(
     isAnimationRunning: Boolean,
@@ -69,14 +76,14 @@ fun AnimatedMicButton(
             onClick()
         },
         shape = RoundedStarShape(rotation = animatedCurrentRotationDegrees),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffCFE6FD))
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
     ) {
         Icon(
             modifier = Modifier
                 .padding(32.dp)
                 .size(32.dp),
             imageVector = ImageVector.vectorResource(id = R.drawable.outline_mic_24),
-            tint = Color(0xff121212),
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
             contentDescription = null,
         )
     }
