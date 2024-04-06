@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,8 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.perceive.R
+import com.example.perceive.ui.PerceiveApp
+import com.example.perceive.ui.theme.PerceiveTheme
 
 @Composable
 fun WelcomeScreen(onNavigateToHomeScreenButtonClick: () -> Unit) {
@@ -59,5 +65,17 @@ fun WelcomeScreen(onNavigateToHomeScreenButtonClick: () -> Unit) {
             content = { Text(modifier = Modifier.padding(16.dp), text = "Let's get started!") }
         )
     }
+}
 
+@PreviewLightDark
+@PreviewDynamicColors
+@Composable
+private fun WelcomeScreenPreview() {
+    PerceiveTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background,
+            content = { WelcomeScreen(onNavigateToHomeScreenButtonClick = {}) }
+        )
+    }
 }
