@@ -34,14 +34,16 @@ class MainActivity : ComponentActivity() {
             .shouldDisplayWelcomeScreenStream
             .collectAsStateWithLifecycle()
         shouldShowWelcomeScreenState?.let { shouldShowWelcomeScreen ->
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background,
-            ) {
-                PerceiveApp(
-                    shouldShowWelcomeScreen = shouldShowWelcomeScreen,
-                    onNavigateToHomeScreen = mainViewModel::onNavigateToHomeScreen
-                )
+            PerceiveTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    PerceiveApp(
+                        shouldShowWelcomeScreen = shouldShowWelcomeScreen,
+                        onNavigateToHomeScreen = mainViewModel::onNavigateToHomeScreen
+                    )
+                }
             }
         }
     }
