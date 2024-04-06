@@ -15,7 +15,7 @@ want to know more about it? Just point the camera and ask away!
 Coming Soon!
 
 ## Screenshots
-Coming soon!
+<img src = "images/welcome_screen.png" width = "270" height = "600" /> <img src = "images/home_screen.png" width = "270" height = "600" /> <img src = "images/chat_screen.png" width = "270" height = "600" /> 
 
 ## Tech Stack
 - Entirely written in [Kotlin](https://kotlinlang.org/).
