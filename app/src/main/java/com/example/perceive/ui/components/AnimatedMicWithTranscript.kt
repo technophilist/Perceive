@@ -29,10 +29,6 @@ fun AnimatedMicButtonWithTranscript(
     onStartListening: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val textGradientBrush = remember {
-        Brush.horizontalGradient(listOf(Color(0xff4285f4), Color.White))
-    }
-
     Column(
         modifier = modifier
     ) {
@@ -48,7 +44,7 @@ fun AnimatedMicButtonWithTranscript(
                         .padding(16.dp)
                         .animateContentSize(),
                     text = userTextTranscription ?: "",
-                    style = MaterialTheme.typography.titleLarge.copy(brush = textGradientBrush)
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
         }
