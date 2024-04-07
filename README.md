@@ -1,4 +1,5 @@
 # Perceive - Point. Ask. Learn. - AI insights at your fingertips
+![Banner Image](images/banner_image.png)
 
 Perceive is a fully AI powered Android App that helps you to explore, learn and play like never before! Just point your camera at anything and start a conversation! See something interesting and
 want to know more about it? Just point the camera and ask away!
