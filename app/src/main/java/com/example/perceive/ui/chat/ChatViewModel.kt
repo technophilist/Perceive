@@ -1,5 +1,6 @@
 package com.example.perceive.ui.chat
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -13,7 +14,6 @@ import com.example.perceive.domain.speech.transcription.TranscriptionService
 import com.example.perceive.domain.speech.tts.TextToSpeechService
 import com.example.perceive.ui.navigation.PerceiveNavigationDestinations
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -61,7 +61,17 @@ class ChatViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
         languageModelClient.startNewChatSession()
-        generateResponseForInitialPromptAndImage()
+
+        // Generate response for initial prompt adding message to chat items list
+        _uiState.update { it.copy(messages = listOf(initialUserChatMessage)) }
+        viewModelScope.launch {
+            val initialBitmap = bitmapStore
+                .retrieveBitmapForUri(conversationImageBitmapUri) // todo: error handling / delete image after using it
+            generateLanguageModelResponseUpdatingUiState(
+                messageToModel = initialUserChatMessage.message,
+                image = initialBitmap
+            )
+        }
     }
 
     fun startTranscription() {
@@ -71,31 +81,25 @@ class ChatViewModel @Inject constructor(
             transcription = { transcription -> _userSpeechTranscriptionStream.update { transcription } },
             onEndOfSpeech = {
                 _uiState.update { it.copy(isListening = false) }
-                processTranscriptionAndGenerateResponse()
+                // Checks for checking if transcription is valid
+                val userTranscription =
+                    _userSpeechTranscriptionStream.value ?: return@startListening
+                if (userTranscription.isBlank()) return@startListening
+
+                // If it is a valid transcription, add transcription to chat messages
+                // Before adding the transcription to the chat, clear the transcription stream
+                _userSpeechTranscriptionStream.update { null }
+                val userTranscriptionChatMessage = ChatMessage(
+                    message = userTranscription,
+                    role = ChatMessage.Role.USER
+                )
+                _uiState.update { it.copy(messages = it.messages + userTranscriptionChatMessage) }
+
+                viewModelScope.launch {
+                    generateLanguageModelResponseUpdatingUiState(messageToModel = userTranscription)
+                }
             },
             onError = { _uiState.update { it.copy(isListening = false, hasErrorOccurred = true) } }
-        )
-    }
-
-    private fun processTranscriptionAndGenerateResponse() {
-        val userTranscription =
-            _userSpeechTranscriptionStream.value ?: return
-        if (userTranscription.isBlank()) return
-        // before adding the transcription to the chat, clear the transcription stream
-        _userSpeechTranscriptionStream.update { null }
-        val userTranscriptionChatMessage = ChatMessage(
-            message = userTranscription,
-            role = ChatMessage.Role.USER
-        )
-        _uiState.update {
-            it.copy(messages = it.messages + userTranscriptionChatMessage)
-        }
-        val messageToModel = listOf(
-            MultiModalLanguageModelClient.MessageContent.Text(text = userTranscription)
-        )
-        generateLanguageModelResponseUpdatingUiState(
-            messageToModel = messageToModel,
-            isAssistantMuted = _uiState.value.isAssistantMuted
         )
     }
 
@@ -110,44 +114,38 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun generateResponseForInitialPromptAndImage() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(messages = listOf(initialUserChatMessage)) }
-            val initialBitmap = bitmapStore
-                .retrieveBitmapForUri(conversationImageBitmapUri)
-                ?: return@launch // todo: error handling / delete image after using it
-            val messageToModel = listOf(
-                MultiModalLanguageModelClient.MessageContent.Image(initialBitmap),
-                MultiModalLanguageModelClient.MessageContent.Text(text = initialUserChatMessage.message),
-            )
-            generateLanguageModelResponseUpdatingUiState(
-                messageToModel = messageToModel,
-                isAssistantMuted = _uiState.value.isAssistantMuted
-            )
-        }
-    }
-
-    private fun generateLanguageModelResponseUpdatingUiState(
-        messageToModel: List<MultiModalLanguageModelClient.MessageContent>,
-        isAssistantMuted: Boolean
+    private suspend fun generateLanguageModelResponseUpdatingUiState(
+        messageToModel: String,
+        image: Bitmap? = null
     ) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                val response = languageModelClient.sendMessage(messageToModel)
-                    .getOrThrow()
-                    .let { ChatMessage(message = it, role = ChatMessage.Role.ASSISTANT) }
-                _uiState.update { it.copy(messages = it.messages + response) }
-                if (!isAssistantMuted) {
-                    textToSpeechService.startSpeaking(response.message, {})
-                }
-            } catch (exception: Exception) {
-                if (exception is CancellationException) throw exception
-                _uiState.update { it.copy(hasErrorOccurred = true) }
-            } finally {
-                _uiState.update { it.copy(isLoading = false) }
-            }
+        val messageContentList = mutableListOf<MultiModalLanguageModelClient.MessageContent>()
+        // add image
+        image?.let {
+            messageContentList.add(
+                MultiModalLanguageModelClient.MessageContent.Image(it)
+            )
         }
+        // add text
+        messageContentList.add(
+            MultiModalLanguageModelClient.MessageContent.Text(text = messageToModel)
+        )
+
+        _uiState.update { it.copy(isLoading = true) }
+        val modelResponse = languageModelClient.sendMessage(messageContentList)
+            .getOrNull()
+            ?.let { ChatMessage(message = it, role = ChatMessage.Role.ASSISTANT) }
+        if (modelResponse == null) {
+            _uiState.update { it.copy(isLoading = false, hasErrorOccurred = true) }
+            return
+        }
+        _uiState.update { it.copy(messages = it.messages + modelResponse) }
+        _uiState.update { it.copy(isLoading = false) }
+        // speak if not muted
+        if (_uiState.value.isAssistantMuted) return
+        textToSpeechService.startSpeaking(
+            text = modelResponse.message,
+            onFailure = { /*TODO*/ }
+        )
     }
 
     override fun onCleared() {
