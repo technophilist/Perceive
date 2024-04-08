@@ -6,6 +6,18 @@ import android.speech.RecognitionListener
 /**
  * Builds a recognition listener that handles various speech recognition events.
  *
+ * Important points to note about the [RecognitionListener]
+ *
+ * - The [onPartialResults] callback, as the name implies, only gives partial results.
+ *   This means that the last word / last couple of words has /have a high probability of not
+ *   getting transcribed (This was also experienced when using this callback exclusively while
+ *   manually testing this app).Hence, please also use [onResults] to get the full transcription
+ *   at the end.
+ *
+ *  - Don't use [onEndOfSpeech] callback to stop listening to the user / stopping transcription.
+ *    It only indicates the "end of speech". It doesn't really imply that the entire speech
+ *    has be transcribed. Always use the [onResults] callback to get the full transcript.
+ *
  * @param onReadyForSpeech Called when the recognition is ready to start listening for speech.
  * @param onBeginningOfSpeech Called when the user starts speaking.
  * @param onRmsChanged Called when the RMS (root mean square) dB value of the audio stream changes.
