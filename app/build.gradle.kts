@@ -75,10 +75,6 @@ dependencies {
     implementation(libs.bundles.compose)
     androidTestImplementation(libs.bundles.composeTest)
 
-    // image loading & gif
-    implementation(libs.coil.compose)
-    implementation(libs.coil.gif)
-
     // CameraX
     implementation(libs.camera.core)
     implementation(libs.camera.camera2)
