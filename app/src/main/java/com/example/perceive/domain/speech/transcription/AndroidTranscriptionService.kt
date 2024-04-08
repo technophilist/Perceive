@@ -27,17 +27,23 @@ class AndroidTranscriptionService @Inject constructor(
         onError: (Exception) -> Unit
     ) {
         val listener = createRecognitionListener(
-            onEndOfSpeech = {
-                speechRecognizer.stopListening()
-                speechRecognizer.destroy()
-                onEndOfSpeech()
-            },
+            onEndOfSpeech = { /* See docs on why this is not being used */ },
             onError = { onError(Exception("An error occurred when transcribing.")) },
             onPartialResults = { partialResultsBundle ->
                 val transcript = partialResultsBundle
                     ?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                     ?.first() ?: return@createRecognitionListener
                 transcription(transcript)
+
+            },
+            onResults = { resultsBundle ->
+                // See createRecognitionListener() docs to understand why this is
+                // also used in addition to onPartialResults.
+                val transcript = resultsBundle
+                    ?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    ?.first() ?: return@createRecognitionListener
+                transcription(transcript)
+                onEndOfSpeech()
             }
         )
         speechRecognizer.setRecognitionListener(listener)
