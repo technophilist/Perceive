@@ -115,6 +115,11 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun stopAssistantIfSpeaking() {
+        if (!_uiState.value.isAssistantSpeaking) return
+        textToSpeechService.stop()
+    }
+
     private suspend fun generateLanguageModelResponseUpdatingUiState(
         messageToModel: String,
         image: Bitmap? = null
