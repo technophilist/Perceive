@@ -11,5 +11,5 @@ data class ChatScreenUiState(
     val isLoading: Boolean = false,
     val hasErrorOccurred: Boolean = false,
     val isAssistantMuted: Boolean = false,
-    val isAssistantSpeaking: Boolean = true
+    val isAssistantSpeaking: Boolean = false
 )
