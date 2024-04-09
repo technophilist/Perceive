@@ -49,7 +49,6 @@ import com.example.perceive.domain.chat.ChatMessage
 import com.example.perceive.ui.components.AnimatedMicButtonWithTranscript
 import com.example.perceive.ui.components.ChatMessageCard
 import com.example.perceive.ui.components.Role
-import com.example.perceive.ui.onboarding.WelcomeScreen
 import com.example.perceive.ui.theme.PerceiveTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -66,9 +65,12 @@ fun ChatScreen(
     onStartListening: () -> Unit,
     isAssistantMuted: Boolean,
     onAssistantMutedChange: (isMuted: Boolean) -> Unit,
+    isAssistantSpeaking: Boolean,
+    onStopAssistantSpeechButtonClick: () -> Unit,
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val chatScreenHaptics = rememberChatScreenHaptics()
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
@@ -115,6 +117,23 @@ fun ChatScreen(
                         .padding(16.dp)
                         .size(64.dp)
                 )
+            } else if (isAssistantSpeaking) {
+                IconButton(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .size(80.dp),
+                    onClick = {
+                        chatScreenHaptics.provideStopAssistantSpeechHapticFeedback()
+                        onStopAssistantSpeechButtonClick()
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(80.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.baseline_stop_circle_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
             } else {
                 AnimatedMicButtonWithTranscript(
                     userTextTranscription = currentTranscription,
@@ -225,6 +244,14 @@ private class ChatScreenHaptics(
     fun provideUnMutedHapticFeedback() {
         localHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
     }
+
+    fun provideStopAssistantSpeechHapticFeedback() {
+        scope.launch {
+            localHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+            delay(5)
+            localHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
 }
 
 
@@ -256,6 +283,8 @@ private fun ChatScreenPreview() {
                 onStartListening = {},
                 isAssistantMuted = false,
                 onAssistantMutedChange = {},
+                isAssistantSpeaking = true,
+                onStopAssistantSpeechButtonClick = {},
                 onBackButtonClick = {}
             )
         }
