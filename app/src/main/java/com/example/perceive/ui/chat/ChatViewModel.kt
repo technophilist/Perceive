@@ -14,6 +14,7 @@ import com.example.perceive.domain.speech.transcription.TranscriptionService
 import com.example.perceive.domain.speech.tts.TextToSpeechService
 import com.example.perceive.ui.navigation.PerceiveNavigationDestinations
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -142,10 +143,19 @@ class ChatViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = false) }
         // speak if not muted
         if (_uiState.value.isAssistantMuted) return
-        textToSpeechService.startSpeaking(
-            text = modelResponse.message,
-            onFailure = { /*TODO*/ }
-        )
+        speakTextUpdatingUiState(text = modelResponse.message)
+    }
+
+    private suspend fun speakTextUpdatingUiState(text: String) {
+        try {
+            _uiState.update { it.copy(isAssistantSpeaking = true) }
+            textToSpeechService.startSpeaking(text = text)
+        } catch (exception: Exception) {
+            if (exception is CancellationException) throw exception
+            _uiState.update { it.copy(hasErrorOccurred = true) }
+        } finally {
+            _uiState.update { it.copy(isAssistantSpeaking = false) }
+        }
     }
 
     override fun onCleared() {
@@ -155,3 +165,4 @@ class ChatViewModel @Inject constructor(
         super.onCleared()
     }
 }
+
