@@ -8,23 +8,17 @@ import java.lang.Exception
 interface TextToSpeechService {
 
     /**
-     * Starts speaking the given text.
+     * Starts speaking the given text. Throws [Exception] if any error occurs.
      *
      * @param text The text to speak.
-     * @param onFailure A callback that is invoked if an error occurs while attempting to speak.
-     * @param onSuccess A callback that is invoked if the text is successfully spoken.
      */
-    suspend fun startSpeaking(
-        text: String,
-        onFailure: (Exception) -> Unit,
-        onSuccess: (() -> Unit)? = null
-    )
+    suspend fun startSpeaking(text: String)
 
     /**
      * Stops speaking if the service is currently speaking.
      */
     fun stop()
-    
+
     /**
      * Used to release all resources held by a particular instance. The instance
      * cannot be reused. In other words, a new instance needs to be created
