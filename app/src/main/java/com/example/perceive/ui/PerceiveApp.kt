@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -130,6 +131,7 @@ private fun NavGraphBuilder.chatScreen(route: String, navController: NavControll
             event = Lifecycle.Event.ON_PAUSE,
             onEvent = viewModel::stopAssistantIfSpeaking
         )
+        DisposableEffect(Unit) { onDispose(viewModel::clearCache) }
         ChatScreen(
             isAssistantResponseLoading = uiState.isLoading,
             chatMessages = uiState.messages,
