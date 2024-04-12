@@ -31,6 +31,7 @@ Coming Soon!
 
 ## Notable features
 <dl>
+  
   <dt>Haptic Feedback 🪄</dt>
   <dd>The app subtly improves the user experience by leveraging the on-device vibration actuators to provide haptic feedbacks when certain events occur in the app such as muting the assistant and tapping the mic.</dd>
 
@@ -39,6 +40,9 @@ Coming Soon!
 
   <dt>Themed App Icons (Android 13+) 🌈</dt>
   <dd>The app also supports the "Themed Icons" feature available on Android 13 and later. If the user has opted in for the feature on a device that is running Android 13 and higher, the app's icon will be tinted to inherit the coloring of the user’s chosen wallpaper and other themes.</dd>
+
+  <dt>Intelligent Cache Management ✨</dt>
+  <dd>The app automatically clears cache data once it's no longer required, ensuring efficient resource utilization.</dd>
   
 </dl>
 
