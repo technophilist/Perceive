@@ -55,4 +55,9 @@ class AndroidBitmapStore @Inject constructor(
         }
     }
 
+    override suspend fun deleteAllSavedBitmaps() = withContext(ioDispatcher) {
+        val files = parentDir.listFiles() ?: return@withContext false
+        return@withContext files.map(File::deleteRecursively)
+            .all { wasFileDeletedSuccessfully -> wasFileDeletedSuccessfully }
+    }
 }

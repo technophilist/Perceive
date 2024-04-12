@@ -25,4 +25,10 @@ interface BitmapStore {
      * Returns `true` if the bitmap was deleted successfully, `false` otherwise.
      */
     suspend fun deleteBitmapWithUri(uri: Uri): Boolean
+
+    /**
+     * Deletes all saved bitmaps.
+     * Returns `true` if all bitmaps were deleted successfully, `false` otherwise.
+     */
+    suspend fun deleteAllSavedBitmaps(): Boolean
 }
