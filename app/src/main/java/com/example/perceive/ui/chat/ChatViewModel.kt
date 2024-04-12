@@ -163,6 +163,12 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun clearCache() {
+        // Note: Calling this in onCleared is not possible because
+        // viewModelScope gets cancelled before onCleared is called.
+        viewModelScope.launch { bitmapStore.deleteAllSavedBitmaps() }
+    }
+
     override fun onCleared() {
         languageModelClient.endChatSession()
         textToSpeechService.stop()
