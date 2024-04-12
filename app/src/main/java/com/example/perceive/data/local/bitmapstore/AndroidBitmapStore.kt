@@ -19,7 +19,7 @@ class AndroidBitmapStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : BitmapStore {
-    private val parentDir = context.cacheDir
+    private val cacheDir = context.cacheDir
 
     override suspend fun saveBitmap(bitmap: Bitmap): Uri? = withContext(ioDispatcher) {
         try {
@@ -27,7 +27,10 @@ class AndroidBitmapStore @Inject constructor(
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
                 byteArrayOutputStream.toByteArray()
             }
-            return@withContext File(parentDir, "${UUID.randomUUID()}.jpeg")
+            return@withContext File(
+                cacheDir,
+                "$PERCEIVE_IMAGE_FILE_PREFIX${UUID.randomUUID()}.$IMAGE_FILE_EXTENSION"
+            )
                 .apply { writeBytes(byteArray) }
                 .toUri()
         } catch (exception: Exception) {
@@ -56,8 +59,27 @@ class AndroidBitmapStore @Inject constructor(
     }
 
     override suspend fun deleteAllSavedBitmaps() = withContext(ioDispatcher) {
-        val files = parentDir.listFiles() ?: return@withContext false
-        return@withContext files.map(File::deleteRecursively)
-            .all { wasFileDeletedSuccessfully -> wasFileDeletedSuccessfully }
+        val files = cacheDir.listFiles() ?: return@withContext false
+
+        for (file in files) {
+            if (file.extension != IMAGE_FILE_EXTENSION) continue
+            if (!file.name.startsWith(PERCEIVE_IMAGE_FILE_PREFIX)) continue
+
+            val wasSuccessfullyDeleted = file.delete()
+            if (!wasSuccessfullyDeleted) return@withContext false
+        }
+        return@withContext true
+    }
+
+    companion object {
+        /**
+         * Common prefix for image files saved by the app.
+         */
+        private const val PERCEIVE_IMAGE_FILE_PREFIX = "perceive_app_"
+
+        /**
+         * Image file extension for image files saved by the app.
+         */
+        private const val IMAGE_FILE_EXTENSION = "jpeg"
     }
 }
