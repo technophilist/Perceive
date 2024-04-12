@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.perceive.data.local.bitmapstore.AndroidBitmapStore
 import junit.framework.TestCase.assertNull
+import junit.framework.TestCase.assertTrue
 
 import org.junit.Before
 import org.junit.Test
@@ -49,6 +50,32 @@ class AndroidBitmapStoreTest {
         bitmapStore.deleteBitmapWithUri(uri)
         // trying to retrieve it must return null
         assertNull(bitmapStore.retrieveBitmapForUri(uri))
+    }
+
+    @Test
+    fun multipleSavesAndClearTest() = runTest(testDispatcher) {
+        // Given a list of saved bitmaps
+        val bitmaps = listOf(
+            Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888),
+            Bitmap.createBitmap(150, 150, Bitmap.Config.ARGB_8888),
+            Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888),
+        )
+        val uris = bitmaps.map { bitmapStore.saveBitmap(it) }
+        advanceUntilIdle()
+
+        uris.zip(bitmaps).forEach { (uri, associatedBitmap) ->
+            // if the bitmap was saved successfully, it must be also be retrievable
+            val retrievedBitmap = bitmapStore.retrieveBitmapForUri(uri!!)
+            advanceUntilIdle()
+            assert(retrievedBitmap!!.width == associatedBitmap.width)
+            assert(retrievedBitmap.height == associatedBitmap.height)
+        }
+
+        // when the bitmap store is cleared
+        assertTrue(bitmapStore.deleteAllSavedBitmaps())
+
+        // trying to retrieve the bitmaps must return null
+        assert(uris.all { bitmapStore.retrieveBitmapForUri(it!!) == null })
     }
 
 
