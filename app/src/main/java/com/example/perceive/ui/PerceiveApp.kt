@@ -126,6 +126,10 @@ private fun NavGraphBuilder.chatScreen(route: String, navController: NavControll
         val viewModel = hiltViewModel<ChatViewModel>()
         val currentUserTranscription by viewModel.userSpeechTranscriptionStream.collectAsStateWithLifecycle()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        LifecycleEventEffect(
+            event = Lifecycle.Event.ON_PAUSE,
+            onEvent = viewModel::stopAssistantIfSpeaking
+        )
         ChatScreen(
             isAssistantResponseLoading = uiState.isLoading,
             chatMessages = uiState.messages,
