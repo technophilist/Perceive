@@ -103,6 +103,13 @@ class ChatViewModel @Inject constructor(
         )
     }
 
+    fun stopTranscription() {
+        _userSpeechTranscriptionStream.update { null }
+        transcriptionService.stopListening()
+        _uiState.update { it.copy(isListening = false) }
+    }
+
+
     fun onAssistantMutedStateChange(isMuted: Boolean) {
         _uiState.update { it.copy(isAssistantMuted = isMuted) }
         viewModelScope.launch { preferencesManager.setAssistantMutedStatus(isMuted) }
