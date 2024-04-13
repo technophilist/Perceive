@@ -144,7 +144,16 @@ private fun NavGraphBuilder.chatScreen(route: String, navController: NavControll
             chatMessages = uiState.messages,
             currentTranscription = currentUserTranscription,
             isListening = uiState.isListening,
-            onStartListening = viewModel::startTranscription,
+            onStartListening = {
+                // If the app is already listening and a request to start listening is made,
+                // it indicates that the current transcription needs to be stopped.
+                // Hence, stop the current transcription.
+                if (uiState.isListening) {
+                    viewModel.stopTranscription()
+                    return@ChatScreen
+                }
+                viewModel.startTranscription()
+            },
             isAssistantMuted = uiState.isAssistantMuted,
             onAssistantMutedChange = viewModel::onAssistantMutedStateChange,
             isAssistantSpeaking = uiState.isAssistantSpeaking,
