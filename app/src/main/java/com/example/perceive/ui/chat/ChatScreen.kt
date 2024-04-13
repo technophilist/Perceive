@@ -28,11 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -93,7 +90,7 @@ fun ChatScreen(
                 )
             },
             actions = {
-                AnimatedSoundToggleButton(
+                SoundToggleButton(
                     isAssistantMuted = isAssistantMuted,
                     onAssistantMutedChange = onAssistantMutedChange
                 )
@@ -176,22 +173,15 @@ private fun ChatMessagesList(chatMessages: List<ChatMessage>, modifier: Modifier
 }
 
 @Composable
-private fun AnimatedSoundToggleButton(
+private fun SoundToggleButton(
     isAssistantMuted: Boolean,
     onAssistantMutedChange: (isMuted: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val chatScreenHaptics = rememberChatScreenHaptics()
-    var isMuteStatusTextVisible by remember { mutableStateOf(true) }
     val volumeOffIcon = ImageVector.vectorResource(id = R.drawable.baseline_volume_off_24)
     val volumeUpIcon = ImageVector.vectorResource(id = R.drawable.baseline_volume_up_24)
 
-    // Used to display the description text in an animated way
-    LaunchedEffect(isAssistantMuted) {
-        isMuteStatusTextVisible = true
-        delay(1_500)
-        isMuteStatusTextVisible = false
-    }
     Row(
         modifier = modifier.animateContentSize(),
         verticalAlignment = Alignment.CenterVertically
@@ -212,9 +202,6 @@ private fun AnimatedSoundToggleButton(
                 },
                 content = { Icon(imageVector = volumeUpIcon, contentDescription = null) }
             )
-        }
-        if (isMuteStatusTextVisible) {
-            Text(text = "Assistant ${if (isAssistantMuted) "muted" else "un-muted"}")
         }
     }
 }
