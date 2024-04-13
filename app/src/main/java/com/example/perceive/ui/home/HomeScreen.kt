@@ -5,10 +5,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.perceive.R
 import com.example.perceive.ui.components.AnimatedMicButtonWithTranscript
 import com.example.perceive.ui.components.CameraPreview
 
@@ -42,6 +48,15 @@ fun HomeScreen(
         CameraPreview(
             modifier = Modifier.fillMaxSize(),
             controller = cameraController
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(16.dp),
+            text = stringResource(R.string.app_name),
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleLarge
         )
         AnimatedMicButtonWithTranscript(
             modifier = Modifier
