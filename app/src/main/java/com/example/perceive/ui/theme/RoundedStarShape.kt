@@ -28,7 +28,14 @@ class RoundedStarShape(
     }
 
     private val steps = (TWO_PI) / min(iterations, 360)
-    private val rotationDegree = (PI / 180) * rotation
+
+    // Note: Author did not negate the rotation value.
+    // Without negating the rotation value, the animation
+    // plays backwards when an appropriate rotation is given.
+    // (Hint: remove negation and try applying rotation
+    // to this composable and to another composable using
+    // graphicsLayer { rotationZ = //your value in degrees }.
+    private val rotationDegree = (PI / 180) * -rotation
 
     override fun createOutline(
         size: Size,
