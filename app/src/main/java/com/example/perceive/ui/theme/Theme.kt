@@ -85,7 +85,7 @@ fun PerceiveTheme(
     }
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = PerceiveTypography,
         content = content
     )
 }
