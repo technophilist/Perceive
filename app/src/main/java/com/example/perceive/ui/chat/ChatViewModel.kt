@@ -29,7 +29,6 @@ class ChatViewModel @Inject constructor(
     private val transcriptionService: TranscriptionService,
     private val textToSpeechService: TextToSpeechService,
     private val languageModelClient: MultiModalLanguageModelClient,
-    private val uiSoundPlayer: UISoundPlayer,
     private val bitmapStore: BitmapStore,
     private val preferencesManager: UserPreferencesManager,
     savedStateHandle: SavedStateHandle,
@@ -107,12 +106,7 @@ class ChatViewModel @Inject constructor(
     fun onAssistantMutedStateChange(isMuted: Boolean) {
         _uiState.update { it.copy(isAssistantMuted = isMuted) }
         viewModelScope.launch { preferencesManager.setAssistantMutedStatus(isMuted) }
-        if (isMuted) {
-            uiSoundPlayer.playSound(UISoundPlayer.UISound.ASSISTANT_MUTED)
-            textToSpeechService.stop()
-        } else {
-            uiSoundPlayer.playSound(UISoundPlayer.UISound.ASSISTANT_UNMUTED)
-        }
+        if (isMuted) textToSpeechService.stop()
     }
 
     fun stopAssistantIfSpeaking() {
