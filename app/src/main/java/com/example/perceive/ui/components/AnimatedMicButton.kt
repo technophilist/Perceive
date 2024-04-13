@@ -1,6 +1,12 @@
 package com.example.perceive.ui.components
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,29 +46,23 @@ import kotlinx.coroutines.launch
  * @param onClick callback to invoked when the button is clicked.
  * @param modifier [Modifier] to be applied to the composable.
  */
-//  todo: fix AnimatedMicButton anim after 1full rotation
 @Composable
 fun AnimatedMicButton(
     isAnimationRunning: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var currentRotationDegrees by remember { mutableFloatStateOf(360f) }
-    val animatedCurrentRotationDegrees by animateFloatAsState(
-        targetValue = currentRotationDegrees,
-        label = ""
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    val animatedCurrentRotationDegrees by infiniteTransition.animateFloat(
+        label = "",
+        initialValue = 0f,
+        targetValue = if (isAnimationRunning) 360f else 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 5_000, easing = LinearEasing)
+        ),
     )
     val localHapticFeedback = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
-    LaunchedEffect(isAnimationRunning) {
-        if (!isAnimationRunning) return@LaunchedEffect
-        while (true) {
-            ensureActive()
-            delay(20)
-            currentRotationDegrees =
-                (currentRotationDegrees - 1).takeIf { it >= 0 } ?: 360f // todo: fix animation
-        }
-    }
     Button(
         modifier = modifier,
         onClick = {
