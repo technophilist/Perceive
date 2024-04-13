@@ -107,6 +107,13 @@ private fun NavGraphBuilder.homeScreen(navController: NavController, route: Stri
             transcriptionText = transcription,
             homeScreenUiState = uiState,
             onStartListening = {
+                // If the app is already listening and a request to start listening is made,
+                // it indicates that the current transcription needs to be stopped.
+                // Hence, stop the current transcription.
+                if (uiState.isListening) {
+                    homeViewModel.stopTranscription()
+                    return@HomeScreen
+                }
                 cameraController.takePicture(
                     context = context,
                     onSuccess = {
