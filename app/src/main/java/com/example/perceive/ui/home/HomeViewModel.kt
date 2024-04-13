@@ -58,6 +58,12 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    fun stopTranscription() {
+        _userSpeechTranscriptionStream.update { null }
+        transcriptionService.stopListening()
+        _uiState.update { it.copy(isListening = false) }
+    }
+
     private suspend fun rotateImageProxyToCorrectOrientation(imageProxy: ImageProxy): Uri? {
         val rotationDegreesToMakeImageUpright = imageProxy.imageInfo.rotationDegrees.toFloat()
         val bitmap = imageProxy.toBitmap().run {
