@@ -158,7 +158,15 @@ private fun NavGraphBuilder.chatScreen(route: String, navController: NavControll
             onAssistantMutedChange = viewModel::onAssistantMutedStateChange,
             isAssistantSpeaking = uiState.isAssistantSpeaking,
             onStopAssistantSpeechButtonClick = viewModel::stopAssistantIfSpeaking,
-            onBackButtonClick = navController::popBackStack // todo(fix this):this not recommended way to navigate back
+            onBackButtonClick = {
+                // This check is needed to ensure that the back button is not clicked
+                // while the navigation transition is playing. If this is not checked, the
+                // user could possibly pop the back stack twice resulting in an invalid
+                // app state. - https://www.youtube.com/watch?v=aV-Yai4zDc0
+                val isNavigationBackNotInProgress =
+                    navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED
+                if (isNavigationBackNotInProgress) navController.popBackStack()
+            }
         )
     }
 }
