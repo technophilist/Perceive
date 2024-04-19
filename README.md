@@ -46,7 +46,9 @@ Coming Soon!
 
   <dt>Intelligent Cache Management ✨</dt>
   <dd>The app automatically clears cache data once it's no longer required, ensuring efficient resource utilization.</dd>
-  
+
+  <dt>One time welcome screen 🙋🏼</dt>
+  <dd>The app greets users with a captivating welcome screen (displayed only on the first time the user launches the app after installation), ensuring a simple but effective onboarding experience.
 </dl>
 
 ## Source code, Architecture, & Testing
